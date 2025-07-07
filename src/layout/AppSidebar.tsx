@@ -10,6 +10,7 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
+  InfoIcon,
   ListIcon,
   PageIcon,
   PieChartIcon,
@@ -31,6 +32,16 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+  },
+  {
+    icon: <BoxCubeIcon />,
+    name: "Category",
+    path: "/category",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Article",
+    path: "/article",
   },
   {
     icon: <CalenderIcon />,

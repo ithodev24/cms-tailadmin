@@ -15,13 +15,14 @@ import { useSearch } from "@/layout/SearchContext";
 
 interface Article {
   id: number;
+  entity: string;
   title: string;
   slug: string;
   content: string;
   thumbnail: string;
   publishedAt: string;
   status: number;
-  category: { nama: string } | null;
+  // category: { nama: string } | null;
   user: { name: string } | null;
 }
 
@@ -91,8 +92,8 @@ export default function ArticleTable() {
       article.title.toLowerCase().includes(lowerSearch) ||
       article.slug.toLowerCase().includes(lowerSearch) ||
       article.content.toLowerCase().includes(lowerSearch) ||
-      article.user?.name.toLowerCase().includes(lowerSearch) ||
-      article.category?.nama.toLowerCase().includes(lowerSearch)
+      article.user?.name.toLowerCase().includes(lowerSearch)
+      // article.category?.nama.toLowerCase().includes(lowerSearch)
     );
   });
 
@@ -108,7 +109,8 @@ export default function ArticleTable() {
       <Table className="w-full table-auto text-sm">
         <TableHeader className="bg-gray-300 text-xs uppercase">
           <TableRow>
-            {["ID", "Kategori", "Judul", "Slug", "Konten", "Thumbnail", "Status", "Tanggal Publish", "Penulis", "Aksi"].map((title) => (
+            {["ID","Entity", "Judul", "Slug", "Konten", "Tanggal Publish", "Status", "Thumbnail","Aksi"].map((title) => (
+            // {["ID","Entity", "Judul", "Slug", "Konten", "Status", "Tanggal Publish", "Penulis", "Thumbnail","Aksi"].map((title) => (
               <TableCell key={title} className="text-center px-4 py-2">
                 {title}
               </TableCell>
@@ -119,19 +121,19 @@ export default function ArticleTable() {
         <TableBody className="divide-y divide-gray-200">
           {loading ? (
             <TableRow>
-              <TableCell colSpan={10} className="text-center py-4">
+              <TableCell colSpan={11} className="text-center py-4">
                 Memuat data...
               </TableCell>
             </TableRow>
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={10} className="text-center text-red-500 py-4">
+              <TableCell colSpan={11} className="text-center text-red-500 py-4">
                 {error}
               </TableCell>
             </TableRow>
           ) : paginatedArticles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={10} className="text-center text-gray-500 py-4">
+              <TableCell colSpan={11} className="text-center text-gray-500 py-4">
                 Tidak ada data artikel.
               </TableCell>
             </TableRow>
@@ -139,40 +141,41 @@ export default function ArticleTable() {
             paginatedArticles.map((article) => (
               <TableRow key={article.id} className="hover:bg-gray-50 align-top">
                 <TableCell className="text-center px-4 py-2">{article.id}</TableCell>
-                <TableCell className="text-center px-4 py-2">
+                <TableCell className="text-center px-4 py-2">{article.entity}</TableCell>
+                {/* <TableCell className="text-center px-4 py-2">
                   {article.category?.nama || "Tidak ada kategori"}
-                </TableCell>
-                <TableCell className="text-left px-4 py-2 max-w-[50px] truncate overflow-hidden">
+                </TableCell> */}
+                <TableCell className="text-left px-4 py-2 max-w-[100px] truncate overflow-hidden">
                   {article.title}
                 </TableCell>
-                <TableCell className="text-left px-4 py-2 max-w-[50px] truncate overflow-hidden">
+                <TableCell className="text-left px-4 py-2 max-w-[100px] truncate overflow-hidden">
                   {article.slug}
                 </TableCell>
-                <TableCell className="text-left px-4 py-2 max-w-[50px] truncate overflow-hidden">
+                <TableCell className="text-left px-4 py-2 max-w-[100px] truncate overflow-hidden">
                   {article.content}
-                </TableCell>
-                <TableCell className="text-center px-4 py-2">
-                  <img
-                    src={
-                      article.thumbnail?.trim()
-                        ? `http://localhost:3333${article.thumbnail}`
-                        : "/images/logo/logo-icon.svg"
-                    }
-                    alt="Thumbnail"
-                    className="w-20 h-12 object-cover rounded mx-auto"
-                    onError={(e) => {
-                      e.currentTarget.src = "/images/logo/logo-icon.svg";
-                    }}
-                  />
-                </TableCell>
-                <TableCell className="text-center px-4 py-2">
-                  {renderStatus(article.status)}
                 </TableCell>
                 <TableCell className="text-center px-4 py-2">
                   {formatDate(article.publishedAt)}
                 </TableCell>
                 <TableCell className="text-center px-4 py-2">
+                  {renderStatus(article.status)}
+                </TableCell>
+                {/* <TableCell className="text-center px-4 py-2">
                   {article.user?.name || "Tidak ada penulis"}
+                </TableCell> */}
+                <TableCell className="text-center px-4 py-2">
+                  <img
+                    src={
+                      article.thumbnail?.trim()
+                        ? `http://localhost:3333${article.thumbnail}`
+                        : "tidak ada foto"
+                    }
+                    alt="Thumbnail"
+                    className="w-20 h-12 object-cover rounded mx-auto"
+                    // onError={(e) => {
+                    //   e.currentTarget.src = "/images/logo/logo-icon.svg";
+                    // }}
+                  />
                 </TableCell>
                 <TableCell className="text-center px-4 py-2 space-x-2">
                   <Link href={`/article/edit/${article.slug}`} title="Edit">

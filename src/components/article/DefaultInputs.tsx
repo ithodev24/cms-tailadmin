@@ -6,11 +6,8 @@ import ComponentCard from "../common/ComponentCard";
 import Label from "../article/Label";
 import Input from "../article/InputField"; // Pastikan ini menggunakan Input yang sudah diperbaiki
 import FileInput from "../article/FileInput";
-
-interface Category {
-  id: number;
-  nama: string;
-}
+import Select from './Select'
+import RadioGroup from './Radio';
 
 interface ErrorItem {
   field: string;
@@ -26,13 +23,12 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
+  const [entity, setEntity] = useState("");
   const [content, setContent] = useState("");
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [oldThumbnailUrl, setOldThumbnailUrl] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
   const [userId] = useState(1);
+  const [status, setStatus] = useState("0"); // Default ke Draft
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<ErrorItem[]>([]);
 
@@ -40,27 +36,16 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
     if (editMode && id) {
       fetchArticle(id);
     }
-    fetchCategories();
   }, [editMode, id]);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("http://localhost:3333/category");
-      const data = await res.json();
-      setCategories(data);
-    } catch (err) {
-      console.error("Gagal mengambil kategori:", err);
-    }
-  };
 
   const fetchArticle = async (articleId: number) => {
     try {
       const res = await fetch(`http://localhost:3333/article/${articleId}`);
       const data = await res.json();
       setTitle(data.title || "");
-      setSlug(data.slug || "");
+      setEntity(data.entity || "");
       setContent(data.content || "");
-      setCategoryId(data.categoryId?.toString() || "");
       setOldThumbnailUrl(data.thumbnail ? `http://localhost:3333${data.thumbnail}` : "");
     } catch (err) {
       console.error("Gagal memuat data artikel:", err);
@@ -77,12 +62,11 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
       let response;
       if (thumbnail || !editMode) {
         const formData = new FormData();
+        formData.append("entity", entity);
         formData.append("title", title);
-        formData.append("slug", slug);
         formData.append("content", content);
-        formData.append("categoryId", categoryId);
         formData.append("userId", userId.toString());
-        formData.append("status", "1");
+        formData.append("status", status);
         formData.append("publishedAt", new Date().toISOString());
         if (thumbnail) formData.append("thumbnail", thumbnail);
 
@@ -96,11 +80,9 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             title,
-            slug,
             content,
-            categoryId,
             userId,
-            status: "1",
+            status: status,
             publishedAt: new Date().toISOString(),
           }),
         });
@@ -128,14 +110,14 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
     router.push("/article");
   };
 
-  const getError = (field: string) => {
-    return errors.find((e) => e.field === field)?.message;
-  };
+  // const getError = (field: string) => {
+  //   return errors.find((e) => e.field === field)?.message;
+  // };
 
   return (
     <ComponentCard title="">
       <div className="space-y-6">
-        <div>
+        {/* <div>
           <Label>Kategori</Label>
           <select
             className="w-full border px-3 py-2 rounded"
@@ -152,6 +134,38 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
           {getError("categoryId") && (
             <p className="text-red-500 text-sm">{getError("categoryId")}</p>
           )}
+        </div> */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label>Entity</Label>
+          <Select
+            options={[
+              { value: 'RENTAL_MOTOR', label: 'Rental Motor' },
+              { value: 'RENTAL_IPHONE', label: 'Rental Iphone' },
+              { value: 'SEWA_APARTMENT', label: 'Sewa Apartment' },
+            ]}
+            placeholder="Pilih Entity"
+            onChange={(value) => setEntity(value)}
+            defaultValue={entity}
+          />
+          {/* {errors.find((e) => e.field === 'entity') && (
+            <p className="text-red-500 text-sm">
+              {errors.find((e) => e.field === 'entity')?.message}
+            </p>
+          )} */}
+        </div>
+        <div>
+          <Label>Status</Label>
+          <RadioGroup
+            options={[
+              { value: '1', label: 'Publish' },
+              { value: '0', label: 'Draft' },
+            ]}
+            name="status"
+            selectedValue={status}
+            onChange={(value) => setStatus(value)}
+          />
+        </div>
         </div>
         <div>
           <Label>Judul Artikel</Label>
@@ -160,19 +174,8 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
             value={title} // Gunakan value untuk controlled input
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Judul"
-            error={!!getError("title")} // Tampilkan error jika ada
-            hint={getError("title")} // Gunakan hint untuk menampilkan pesan error
-          />
-        </div>
-        <div>
-          <Label>Slug</Label>
-          <Input
-            type="text"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="slug-otomatis"
-            error={!!getError("slug")}
-            hint={getError("slug")}
+            // error={!!getError("title")} // Tampilkan error jika ada
+            // hint={getError("title")} // Gunakan hint untuk menampilkan pesan error
           />
         </div>
         <div>
@@ -183,9 +186,9 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
-          {getError("content") && (
+          {/* {getError("content") && (
             <p className="text-red-500 text-sm">{getError("content")}</p>
-          )}
+          )} */}
         </div>
         <div>
           <Label>Thumbnail</Label>
@@ -202,9 +205,9 @@ export default function DefaultInputs({ editMode = false, id }: CategoryFormProp
               if (file) setThumbnail(file);
             }}
           />
-          {getError("thumbnail") && (
+          {/* {getError("thumbnail") && (
             <p className="text-red-500 text-sm">{getError("thumbnail")}</p>
-          )}
+          )} */}
         </div>
         <div className="flex gap-3">
           <button

@@ -11,15 +11,15 @@ import {
 
 interface Props {
   articleCount: number;
-  categoryCount: number;
+  // categoryCount: number;
 }
 
 const COLORS = ['#407BFF', '#34D399'];
 
-export default function StatsCards({ articleCount, categoryCount }: Props) {
+export default function StatsCards({ articleCount }: Props) {
   const data = [
     { name: 'Artikel', value: articleCount },
-    { name: 'Kategori', value: categoryCount },
+    // { name: 'Kategori', value: categoryCount },
   ];
 
   const [isClient, setIsClient] = useState(false);
@@ -35,8 +35,8 @@ export default function StatsCards({ articleCount, categoryCount }: Props) {
         <h4 className="text-sm text-gray-500">Jumlah Artikel</h4>
         <p className="text-3xl font-bold text-blue-600 mb-4">{articleCount}</p>
 
-        <h4 className="text-sm text-gray-500">Jumlah Kategori</h4>
-        <p className="text-3xl font-bold text-green-500">{categoryCount}</p>
+        {/* <h4 className="text-sm text-gray-500">Jumlah Kategori</h4> */}
+        {/* <p className="text-3xl font-bold text-green-500">{categoryCount}</p> */}
       </div>
 
       {/* Diagram - hanya render di client */}

@@ -2,9 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DefaultInputs from "@/components/article/DefaultInputs";
-import { fetchArticleBySlug, updateArticle } from "@/lib/api";
+import { fetchArticleBySlug } from "@/lib/api";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-
 
 const EditArticlePage = () => {
   const router = useRouter();
@@ -14,30 +13,25 @@ const EditArticlePage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (slug) {
-      const getArticle = async () => {
-        try {
-          const data = await fetchArticleBySlug(slug as string);
-          setInitialData(data);
-        } catch (err) {
-          setError("Gagal memuat data artikel.");
-        } finally {
-          setLoading(false);
-        }
-      };
-      getArticle();
-    }
-  }, [slug]);
+  if (slug) {
+    const getArticle = async () => {
+      try {
+        console.log("Mengambil artikel untuk slug:", slug); 
+        const res = await fetchArticleBySlug(slug as string);
+        console.log("Data artikel berhasil diambil oy:", res);
+        setInitialData(res.data);
 
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      await updateArticle(slug as string, formData);
-      router.push("/article");
-    } catch (err) {
-      setError("Gagal memperbarui artikel.");
-      // Optionally, provide user feedback here
-    }
-  };
+      } catch (err) {
+        console.error("Gagal mengambil artikel:", err);
+        setError("Gagal memuat data artikel.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    getArticle();
+  }
+}, [slug]);
+
 
   if (loading) return <div>Memuat data...</div>;
   if (error) return <div>{error}</div>;
@@ -45,7 +39,9 @@ const EditArticlePage = () => {
   return (
     <>
       <PageBreadcrumb pageTitle="Edit Artikel" />
-      <DefaultInputs />
+      {initialData && (
+        <DefaultInputs editMode={true} initialData={initialData} />
+      )}
     </>
   );
 };

@@ -1,3 +1,4 @@
+// article/page.tsx
 "use client";
 
 import ArticleTable from "@/components/article/ArticleTable";

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image"; // ✅ Sekarang dipakai beneran
 import {
   Table,
   TableBody,
@@ -22,15 +23,14 @@ interface Article {
   thumbnail: string;
   publishedAt: string;
   status: number;
-  // category: { nama: string } | null;
   user: { name: string } | null;
 }
 
 export default function ArticleTable() {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 5;
   const { searchTerm } = useSearch();
 
@@ -38,16 +38,16 @@ export default function ArticleTable() {
     fetchArticles();
   }, []);
 
-  const fetchArticles = async () => {
+  const fetchArticles = async (): Promise<void> => {
     try {
       const res = await fetch("http://localhost:3333/article", {
         cache: "no-store",
       });
       if (!res.ok) throw new Error("Gagal mengambil data artikel.");
-      const data = await res.json();
+      const data: Article[] = await res.json();
       setArticles(data);
       setError(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Gagal mengambil data artikel:", err);
       setError("Gagal memuat data artikel. Silakan coba lagi.");
     } finally {
@@ -55,7 +55,7 @@ export default function ArticleTable() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number): Promise<void> => {
     if (!confirm("Yakin ingin menghapus artikel ini?")) return;
 
     try {
@@ -69,13 +69,13 @@ export default function ArticleTable() {
       }
       fetchArticles();
       alert("Artikel berhasil dihapus.");
-    } catch (err: any) {
-      alert(`Gagal menghapus artikel: ${err.message}`);
+    } catch (err) {
+      alert(`Gagal menghapus artikel: ${(err as Error).message}`);
       console.error(err);
     }
   };
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr: string): string => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("id-ID", {
       year: "numeric",
@@ -84,7 +84,8 @@ export default function ArticleTable() {
     });
   };
 
-  const renderStatus = (status: number) => (status === 1 ? "Published" : "Draft");
+  const renderStatus = (status: number): string =>
+    status === 1 ? "Published" : "Draft";
 
   const filteredArticles = articles.filter((article) => {
     const lowerSearch = searchTerm.toLowerCase();
@@ -93,7 +94,6 @@ export default function ArticleTable() {
       article.slug.toLowerCase().includes(lowerSearch) ||
       article.content.toLowerCase().includes(lowerSearch) ||
       article.user?.name.toLowerCase().includes(lowerSearch)
-      // article.category?.nama.toLowerCase().includes(lowerSearch)
     );
   });
 
@@ -109,8 +109,17 @@ export default function ArticleTable() {
       <Table className="w-full table-auto text-sm">
         <TableHeader className="bg-gray-300 text-xs uppercase">
           <TableRow>
-            {["ID","Entity", "Judul", "Slug", "Konten", "Tanggal Publish", "Status", "Thumbnail","Aksi"].map((title) => (
-            // {["ID","Entity", "Judul", "Slug", "Konten", "Status", "Tanggal Publish", "Penulis", "Thumbnail","Aksi"].map((title) => (
+            {[
+              "ID",
+              "Entity",
+              "Judul",
+              "Slug",
+              "Konten",
+              "Tanggal Publish",
+              "Status",
+              "Thumbnail",
+              "Aksi",
+            ].map((title) => (
               <TableCell key={title} className="text-center px-4 py-2">
                 {title}
               </TableCell>
@@ -142,9 +151,6 @@ export default function ArticleTable() {
               <TableRow key={article.id} className="hover:bg-gray-50 align-top">
                 <TableCell className="text-center px-4 py-2">{article.id}</TableCell>
                 <TableCell className="text-center px-4 py-2">{article.entity}</TableCell>
-                {/* <TableCell className="text-center px-4 py-2">
-                  {article.category?.nama || "Tidak ada kategori"}
-                </TableCell> */}
                 <TableCell className="text-left px-4 py-2 max-w-[100px] truncate overflow-hidden">
                   {article.title}
                 </TableCell>
@@ -160,22 +166,18 @@ export default function ArticleTable() {
                 <TableCell className="text-center px-4 py-2">
                   {renderStatus(article.status)}
                 </TableCell>
-                {/* <TableCell className="text-center px-4 py-2">
-                  {article.user?.name || "Tidak ada penulis"}
-                </TableCell> */}
                 <TableCell className="text-center px-4 py-2">
-                  <img
-                    src={
-                      article.thumbnail?.trim()
-                        ? `http://localhost:3333${article.thumbnail}`
-                        : "tidak ada foto"
-                    }
-                    alt="Thumbnail"
-                    className="w-20 h-12 object-cover rounded mx-auto"
-                    // onError={(e) => {
-                    //   e.currentTarget.src = "/images/logo/logo-icon.svg";
-                    // }}
-                  />
+                  {article.thumbnail?.trim() ? (
+                    <Image
+                      src={`http://localhost:3333${article.thumbnail}`}
+                      alt="Thumbnail"
+                      width={80}
+                      height={48}
+                      className="object-cover rounded mx-auto"
+                    />
+                  ) : (
+                    <span className="text-xs text-gray-500">Tidak ada foto</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-center px-4 py-2 space-x-2">
                   <Link href={`/article/edit/${article.slug}`} title="Edit">

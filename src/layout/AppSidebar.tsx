@@ -1,24 +1,37 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  BoxCubeIcon,
+  ChevronDown,
+  MoreHorizontal,
+} from "lucide-react";
+import {
   GridIcon,
   ListIcon,
   UserCircleIcon,
-  ChevronDownIcon,
-  HorizontaLDots,
-} from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
+} from "../icons";
+
+type SubItem = {
+  name: string;
+  path: string;
+  pro?: boolean;
+  new?: boolean;
+};
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: SubItem[];
 };
 
 const navItems: NavItem[] = [
@@ -26,12 +39,6 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
-    // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "Category",
-    path: "/category",
   },
   {
     icon: <ListIcon />,
@@ -53,38 +60,33 @@ const AppSidebar: React.FC = () => {
     type: "main";
     index: number;
   } | null>(null);
-  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
-    {}
-  );
+
+  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
-    let submenuMatched = false;
+    let matched = false;
     navItems.forEach((nav, index) => {
-      if (nav.subItems) {
-        nav.subItems.forEach((subItem) => {
-          if (isActive(subItem.path)) {
-            setOpenSubmenu({ type: "main", index });
-            submenuMatched = true;
-          }
-        });
-      }
+      nav.subItems?.forEach((subItem) => {
+        if (isActive(subItem.path)) {
+          setOpenSubmenu({ type: "main", index });
+          matched = true;
+        }
+      });
     });
-
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
+    if (!matched) setOpenSubmenu(null);
   }, [pathname, isActive]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
-      if (subMenuRefs.current[key]) {
+      const el = subMenuRefs.current[key];
+      if (el) {
         setSubMenuHeight((prev) => ({
           ...prev,
-          [key]: subMenuRefs.current[key]?.scrollHeight || 0,
+          [key]: el.scrollHeight || 0,
         }));
       }
     }
@@ -123,16 +125,16 @@ const AppSidebar: React.FC = () => {
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
-              )}
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${
-                    openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
-                      : ""
-                  }`}
-                />
+                <>
+                  <span className="menu-item-text">{nav.name}</span>
+                  <ChevronDown
+                    className={`ml-auto w-5 h-5 transition-transform duration-200 ${
+                      openSubmenu?.index === index
+                        ? "rotate-180 text-brand-500"
+                        : ""
+                    }`}
+                  />
+                </>
               )}
             </button>
           ) : (
@@ -143,6 +145,10 @@ const AppSidebar: React.FC = () => {
                   isActive(nav.path)
                     ? "menu-item-active"
                     : "menu-item-inactive"
+                } ${
+                  !isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "lg:justify-start"
                 }`}
               >
                 <span
@@ -255,7 +261,11 @@ const AppSidebar: React.FC = () => {
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? "Menu" : <HorizontaLDots />}
+                {isExpanded || isHovered || isMobileOpen ? (
+                  "Menu"
+                ) : (
+                  <MoreHorizontal />
+                )}
               </h2>
               {renderMenuItems(navItems)}
             </div>

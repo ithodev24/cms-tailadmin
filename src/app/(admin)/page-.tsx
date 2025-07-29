@@ -15,7 +15,7 @@ export default function AdminHomePage() {
     if (!token) {
       router.push("/signin");
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className="p-4">

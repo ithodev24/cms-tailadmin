@@ -3,8 +3,16 @@ export async function fetchArticles(token?: string) {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     cache: "no-store",
   });
+
   const data = await res.json();
-  return Array.isArray(data.data) ? data.data : data;
+
+  // Jika tidak array, kembalikan array kosong
+  if (!Array.isArray(data?.data)) {
+    console.warn("fetchArticles expected array but got:", data);
+    return [];
+  }
+
+  return data.data;
 }
 
 export async function fetchArticleBySlug(slug: string, token?: string) {

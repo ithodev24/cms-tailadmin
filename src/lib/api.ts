@@ -1,5 +1,5 @@
 export async function fetchArticles(token?: string) {
-  const res = await fetch(`http://localhost:3333/article`, {
+  const res = await fetch(`https://backend.ptdahliaglobalindo.id/article`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     cache: "no-store",
   });
@@ -16,7 +16,7 @@ export async function fetchArticles(token?: string) {
 }
 
 export async function fetchArticleBySlug(slug: string, token?: string) {
-  const res = await fetch(`http://localhost:3333/article/${slug}`, {
+  const res = await fetch(`https://backend.ptdahliaglobalindo.id/article/${slug}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     cache: "no-store",
   });
@@ -25,7 +25,7 @@ export async function fetchArticleBySlug(slug: string, token?: string) {
 }
 
 // export async function fetchCategories(token?: string) {
-//   const res = await fetch("http://localhost:3333/category", {
+//   const res = await fetch("https://backend.ptdahliaglobalindo.id/category", {
 //     headers: token ? { Authorization: `Bearer ${token}` } : {},
 //     cache: "no-store",
 //   });
@@ -34,7 +34,7 @@ export async function fetchArticleBySlug(slug: string, token?: string) {
 // }
 
 export async function updateArticle(slug: string, formData: FormData, token?: string) {
-  const res = await fetch(`http://localhost:3333/article/${slug}`, {
+  const res = await fetch(`https://backend.ptdahliaglobalindo.id/article/${slug}`, {
     method: "POST", // Use POST for FormData, backend should handle it as an update
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: formData,

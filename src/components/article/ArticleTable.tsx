@@ -40,7 +40,7 @@ export default function ArticleTable() {
 
   const fetchArticles = async (): Promise<void> => {
     try {
-      const res = await fetch("http://localhost:3333/article", {
+      const res = await fetch("https://backend.ptdahliaglobalindo.id/article", {
         cache: "no-store",
       });
       if (!res.ok) throw new Error("Gagal mengambil data artikel.");
@@ -59,7 +59,7 @@ export default function ArticleTable() {
     if (!confirm("Yakin ingin menghapus artikel ini?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3333/article/${id}`, {
+      const res = await fetch(`https://backend.ptdahliaglobalindo.id/article/${id}`, {
         method: "DELETE",
       });
 
@@ -169,7 +169,7 @@ export default function ArticleTable() {
                 <TableCell className="text-center px-4 py-2">
                   {article.thumbnail?.trim() ? (
                     <Image
-                      src={`http://localhost:3333${article.thumbnail}`}
+                      src={`https://backend.ptdahliaglobalindo.id${article.thumbnail.replace(/#/g, '%23')}`}
                       alt="Thumbnail"
                       width={80}
                       height={48}

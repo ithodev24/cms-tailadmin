@@ -46,7 +46,7 @@ export default function DefaultInputs({ editMode = false, initialData }: Props) 
       setContent(initialData.content || "");
       setStatus(String(initialData.status ?? "0"));
       setOldThumbnailUrl(
-        initialData.thumbnail ? `http://localhost:3333${initialData.thumbnail}` : ""
+        initialData.thumbnail ? `https://backend.ptdahliaglobalindo.id${initialData.thumbnail}` : ""
       );
     }
   }, [editMode, initialData]);
@@ -55,8 +55,8 @@ export default function DefaultInputs({ editMode = false, initialData }: Props) 
     setMessage("");
 
     const url = editMode && id
-      ? `http://localhost:3333/article/${id}`
-      : "http://localhost:3333/article";
+      ? `https://backend.ptdahliaglobalindo.id/article/${id}`
+      : "https://backend.ptdahliaglobalindo.id/article";
 
     const method = editMode ? "PUT" : "POST";
 

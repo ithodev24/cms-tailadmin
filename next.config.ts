@@ -2,7 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["backend.ptdahliaglobalindo.id"], // ✅ tambahkan ini
+    remotePatterns: [
+      {
+        protocol: "https", // atau http kalau backend belum pakai SSL
+        hostname: "backend.ptdahliaglobalindo.id",
+        port: "", // kosongin kalau pakai default port (80/443)
+        pathname: "/uploads/**",
+      },
+    ],
   },
   webpack(config) {
     config.module.rules.push({
